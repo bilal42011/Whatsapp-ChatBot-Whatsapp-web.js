@@ -1,5 +1,8 @@
 import { Client } from "whatsapp-web.js";
+import openAiClient from "./open-api.js";
 import qrCode from "qrcode-terminal";
+
+console.log(openAiClient);
 
 console.log("Inside Bot.js");
 
@@ -27,12 +30,25 @@ client.on("message", async (message) => {
       console.log("Inside eid mubarak");
       const senderName = contact?.name || contact?.pushname;
       console.log(senderName);
-      message.reply(
-        `${senderName && senderName} Bhai Khair Mubarak❤ apko b Eid Mubarak ❤ `
-      );
+
+      const prompt = `Q: ${message.body}\nA:`;
+      const result = await openAiClient.complete({
+        engine: "text-davinci-002",
+        prompt,
+        maxTokens: 100,
+        n: 1,
+        stop: ["\n"],
+      });
+
+      const response = result.data.choices[0].text.trim();
+      message.reply(response);
+
+      // message.reply(
+      //   `${senderName && senderName} Bhai Khair Mubarak❤ apko b Eid Mubarak ❤ `
+      // );
     }
 
-    // My Profil Url Chat
+    // My Profile Url Chat
     if (message.body.toLowerCase() == "my profile url") {
       const profileUrl = await contact.getProfilePicUrl();
       console.log(profileUrl);
